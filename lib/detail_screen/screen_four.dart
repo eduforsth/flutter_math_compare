@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kids_math_homework/my_widgets/mm_language_change.dart';
+import 'package:kids_math_homework/my_widgets/timer.dart';
 import 'package:kids_math_homework/random.dart';
 
 class ScreenFour extends StatefulWidget {
@@ -22,6 +23,15 @@ class _ScreenFourState extends State<ScreenFour> {
   List<int> q10 = [];
 
   List<int> selectedList01 = [];
+  List<int> selectedList02 = [];
+  List<int> selectedList03 = [];
+  List<int> selectedList04 = [];
+  List<int> selectedList05 = [];
+  List<int> selectedList06 = [];
+  List<int> selectedList07 = [];
+  List<int> selectedList08 = [];
+  List<int> selectedList09 = [];
+  List<int> selectedList10 = [];
 
   List<bool> isAnswer1 = [false,false,false,false,false,];
   List<bool> isAnswer2 = [false,false,false,false,false,];
@@ -36,7 +46,10 @@ class _ScreenFourState extends State<ScreenFour> {
 
   int right = 0;
   int wrong = 0;
-// bool isTimer = false;
+ bool isTimer = true;
+
+   int count = 0;
+  List<String> results = [];
 
   void generate() {
     for (int i = 0; i < 5; i++) {
@@ -53,12 +66,21 @@ class _ScreenFourState extends State<ScreenFour> {
     }
   }
 
-      void restart() {
+    void restart() {
     setState(() {
       right = 0;
       wrong = 0;
-      // isTimer = true;
+      // isTimer = !isTimer;
       selectedList01.clear();
+      selectedList02.clear();
+      selectedList03.clear();
+      selectedList04.clear();
+      selectedList05.clear();
+      selectedList06.clear();
+      selectedList07.clear();
+      selectedList08.clear();
+      selectedList09.clear();
+      selectedList10.clear();
       isAnswer1.clear();
       isAnswer2.clear();
       isAnswer3.clear();
@@ -89,25 +111,26 @@ class _ScreenFourState extends State<ScreenFour> {
       isAnswer8.addAll([false,false,false,false,false,false,false,false,false,false]);
       isAnswer9.addAll([false,false,false,false,false,false,false,false,false,false]);
       isAnswer10.addAll([false,false,false,false,false,false,false,false,false,false]);
+
       generate();
     });
   }
 
-  List sortSmallToBig(List<int> ls) {
+      List<int> sortSmallToBig(List<int> ls) {
     var q = (ls..sort());
-    // var q = (q1..sort());
     return q;
   }
 
-  void compare(List<int> ls) {
-    if (selectedList01.length == 5) {
-      if (sortSmallToBig(ls).toString() == selectedList01.toString()) {
+  void compare(List<int> ls, List<int> selectedLists) {
+    if (selectedLists.length == 5) {
+      if (sortSmallToBig(ls).toString() == selectedLists.toString()) {
         right++;
       } else {
         wrong++;
       }
-        selectedList01.clear();
-        resultDialog();
+
+        // selectedList01.clear();
+        resultTotalDialog();
     }
   }
 
@@ -146,9 +169,13 @@ class _ScreenFourState extends State<ScreenFour> {
     }
   }
 
-  void resultDialog(){
+  void resultTotalDialog(){
                          if (right + wrong == 10) {
+                          count++;
+                          isTimer = !isTimer;  
+                          results.add(languageChange('မှန် = ($right) ခု + မှား = ($wrong) ခု'));
                           showDialog(
+                            barrierDismissible: false,
                             context: (context),
                             builder: (context) {
                               return AlertDialog(
@@ -159,13 +186,26 @@ class _ScreenFourState extends State<ScreenFour> {
                                   OutlinedButton(
                                       onPressed: () {
                                         Navigator.pop(context);
+                                        setState(() {
+                                          isTimer = !isTimer;
+                                          restart();
+                                        });
                                       },
                                       child: const Text('ပိတ်မည်'))
                                 ],
                               );
                             },
                           );
+                          // restart();
                         }   
+  }
+
+    String totalResults() {
+    String str = '';
+    for (int i = 0; i < results.length; i++) {
+      str += '${languageChange((i + 1).toString())}။ ${results[i]} \n';
+    }
+    return str;
   }
 
   @override
@@ -178,16 +218,17 @@ class _ScreenFourState extends State<ScreenFour> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Screen Three'),
+        title: const Text('Screen Four'),
       ),
       body: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-         const Padding(
-          padding: EdgeInsets.all(8.0),
+          Padding(
+          padding: const EdgeInsets.all(8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Center(child: Text('ငယ်စဉ်ကြီးလိုက်စီပါ')),
-            //  CircleAvatar(child: isTimer? tweenTimer(60) : tweenTimer(60))
+              const Center(child: Text('ငယ်စဉ်ကြီးလိုက်စီပါ')),
+              CircleAvatar(child: isTimer? tweenTimer(30, 1, minutes: 1) : const Text('?'), radius: 30,)
+
             ],
           ),
         ),
@@ -196,32 +237,36 @@ class _ScreenFourState extends State<ScreenFour> {
         // Text(sortBigToSmall().reversed.toString()),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(languageChange('မှန်-$right | မှား-$wrong')),
-              OutlinedButton(
-                  onPressed: () {
-                    restart();
-                  },
-                  child: Text('ပြန်စမည်'))
-            ],
-          ),
+          child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.topRight,
+                          children: [
+                            OutlinedButton(
+                                onPressed: () {
+                                  resultDialog(str: totalResults());
+                                },
+                                child: const Text('ရလဒ်များ')),
+                                Positioned(  
+                                  top: -5,
+                                  right: -5,
+                                  child: count ==0? const Text('') : CircleAvatar(child: Text(languageChange('$count'), style: const TextStyle(color: Colors.white, fontSize: 13),), radius: 12, backgroundColor: Colors.red,))
+                          ],
+                        ),
         ),
         
         Expanded(
           child: ListView(
             children: [
-              answerRow(no: 1, num: q1, check: isAnswer1),
-              answerRow(no: 2, num: q2, check: isAnswer2),
-              answerRow(no: 3, num: q3, check: isAnswer3),
-              answerRow(no: 4, num: q4, check: isAnswer4),
-              answerRow(no: 5, num: q5, check: isAnswer5),
-              answerRow(no: 6, num: q6, check: isAnswer6),
-              answerRow(no: 7, num: q7, check: isAnswer7),
-              answerRow(no: 8, num: q8, check: isAnswer8),
-              answerRow(no: 9, num: q9, check: isAnswer9),
-              answerRow(no: 10, num: q10, check: isAnswer10),
+              answerRow(no: 1, num: selectedList01.length == 5? sortSmallToBig(q1): q1, check: isAnswer1, selectedList: selectedList01),
+              answerRow(no: 2, num: selectedList02.length == 5? sortSmallToBig(q2): q2, check: isAnswer2, selectedList: selectedList02),
+              answerRow(no: 3, num: selectedList03.length == 5? sortSmallToBig(q3): q3, check: isAnswer3, selectedList: selectedList03),
+              answerRow(no: 4, num: selectedList04.length == 5? sortSmallToBig(q4): q4, check: isAnswer4, selectedList: selectedList04),
+              answerRow(no: 5, num: selectedList05.length == 5? sortSmallToBig(q5): q5, check: isAnswer5, selectedList: selectedList05),
+              answerRow(no: 6, num: selectedList06.length == 5? sortSmallToBig(q6): q6, check: isAnswer6, selectedList: selectedList06),
+              answerRow(no: 7, num: selectedList07.length == 5? sortSmallToBig(q7): q7, check: isAnswer7, selectedList: selectedList07),
+              answerRow(no: 8, num: selectedList08.length == 5? sortSmallToBig(q8): q8, check: isAnswer8, selectedList: selectedList08),
+              answerRow(no: 9, num: selectedList09.length == 5? sortSmallToBig(q9): q9, check: isAnswer9, selectedList: selectedList09),
+              answerRow(no: 10, num: selectedList10.length == 5? sortSmallToBig(q10): q10, check: isAnswer10, selectedList: selectedList10),
             ],
           ),
         )
@@ -230,19 +275,20 @@ class _ScreenFourState extends State<ScreenFour> {
   }
 
   Widget answerRow(
-      {required int no, required List<int> num, required List<bool> check}) {
+      {required int no, required List<int> num, required List<bool> check, required List<int> selectedList}) {
     return Container(
       padding: const EdgeInsets.all(5),
       margin: const EdgeInsets.all(5),
       decoration:
-          BoxDecoration(border: Border.all(color: Colors.grey.shade400, width: 2),),
+          BoxDecoration(border: Border.all(color: Colors.grey.shade400, width: 2), borderRadius: no.isEven? const BorderRadius.only(topLeft: Radius.circular(20), bottomRight: Radius.circular(20)) : const BorderRadius.only(topRight: Radius.circular(20), bottomLeft: Radius.circular(20))),
       child: Column(
         children: [
           CircleAvatar(
             child: Text(languageChange(no.toString())),
           ),
+          selectedList.length != 5? const Text('') : Text('အဖြေ', style: TextStyle(color: Colors.green.shade400),),
           // Text(num.toString()),
-          // Text(sortBigToSmall(num).toString()),
+          // isShow[no - 1]? Text(languageChange(sortBigToSmall(num).toString())) : const Text(''),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -251,10 +297,13 @@ class _ScreenFourState extends State<ScreenFour> {
                     ? null
                     : () {
                         setState(() {
+                          // print(num.toList());
+
                           // isAnswer1[0] = true;
                           checkRow(no-1, 0);
-                          selectedList01.add(num[0]);
-                          compare(num);
+                          selectedList.add(num[0]);
+                          compare(num, selectedList);
+                          // print(num.toList());
                         });
                       },
                 child: Text(languageChange('${num[0]}')),
@@ -267,10 +316,14 @@ class _ScreenFourState extends State<ScreenFour> {
                     ? null
                     : () {
                         setState(() {
+                          // print(num.toList());
+
                           // isAnswer1[1] = true;
                           checkRow(no-1, 1);
-                          selectedList01.add(num[1]);
-                          compare(num);
+                          selectedList.add(num[1]);
+                          compare(num, selectedList);
+                          // print(num.toList());
+
                         });
                       },
                 child: Text(languageChange('${num[1]}')),
@@ -283,11 +336,15 @@ class _ScreenFourState extends State<ScreenFour> {
                     ? null
                     : () {
                         setState(() {
+                          // print(num.toList());
+
                           // isAnswer1[2] = true;
                           checkRow(no-1, 2);
+    
+                          selectedList.add(num[2]);
+                          compare(num, selectedList);
+                          // print(num.toList());
 
-                          selectedList01.add(num[2]);
-                          compare(num);
                         });
                       },
                 child: Text(languageChange('${num[2]}')),
@@ -300,11 +357,15 @@ class _ScreenFourState extends State<ScreenFour> {
                     ? null
                     : () {
                         setState(() {
+                          // print(num.toList());
+
                           // isAnswer1[3] = true;
                           checkRow(no-1, 3);
+    
+                          selectedList.add(num[3]);
+                          compare(num, selectedList);
+                          // print(num.toList());
 
-                          selectedList01.add(num[3]);
-                          compare(num);
                         });
                       },
                 child: Text(languageChange('${num[3]}')),
@@ -317,11 +378,15 @@ class _ScreenFourState extends State<ScreenFour> {
                     ? null
                     : () {
                         setState(() {
+                          // print(num.toList());
+
                           // isAnswer1[4] = true;
                           checkRow(no-1, 4);
+    
+                          selectedList.add(num[4]);
+                          compare(num, selectedList);
+                          // print(num.toList());
 
-                          selectedList01.add(num[4]);
-                          compare(num);
                         });
                       },
                 child: Text(languageChange('${num[4]}')),
@@ -331,8 +396,30 @@ class _ScreenFourState extends State<ScreenFour> {
               ),
             ],
           ),
+          selectedList.isEmpty? const Text('') : Text(languageChange('ရွေးချယ်ထားသော ဂဏန်းများ(${selectedList.toString()})'), style: TextStyle(color: Colors.green.shade400),),
         ],
       ),
     );
   }
+
+    void resultDialog({required String str}) {
+    showDialog(
+      barrierDismissible: false,
+      context: (context),
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('ရလဒ်များ'),
+          content: Text(str),
+          actions: [
+            OutlinedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('ပိတ်မည်'))
+          ],
+        );
+      },
+    );
+  }
+
 }

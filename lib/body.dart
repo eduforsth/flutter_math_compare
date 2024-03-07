@@ -12,13 +12,13 @@ class Body extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(18.0),
-            child: Text('MATH GAME', style: TextStyle(fontSize: 18),),
+          const Padding(
+            padding:  EdgeInsets.all(18.0),
+            child: Text('Kids Math Game Update', style: TextStyle(fontSize: 18),),
           ),
           GridView(
             shrinkWrap: true,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10
@@ -42,14 +42,14 @@ class Body extends StatelessWidget {
         return GestureDetector(
           onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=> press!)),
           child: Container(
-            margin: EdgeInsets.all(10),
+            margin: const EdgeInsets.all(10),
                   width: 200,
                    height: 200,
                    decoration: BoxDecoration(
                     color: Colors.cyan,
                      borderRadius: num.isEven? const BorderRadius.only(topLeft: Radius.circular(30), bottomRight: Radius.circular(30)) : const BorderRadius.only(topRight: Radius.circular(30), bottomLeft: Radius.circular(30))
                    ),
-                   child: Center(child: Text(text, style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'pyidaungsu_bold'),),),
+                   child: Center(child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'pyidaungsu_bold'),),),
                 ),
         );
       }

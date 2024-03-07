@@ -2,16 +2,18 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:kids_math_homework/my_widgets/mm_language_change.dart';
+import 'package:kids_math_homework/my_widgets/timer.dart';
 import 'package:kids_math_homework/random.dart';
 
 class ScreenOne extends StatefulWidget {
   const ScreenOne({super.key});
 
   @override
-  State<ScreenOne> createState() => _ScreenOneState();
+  State<ScreenOne> createState() => ScreenOneState();
 }
 
-class _ScreenOneState extends State<ScreenOne> {
+class ScreenOneState extends State<ScreenOne> {
+
   List<int> q1 = [];
   List<int> q2 = [];
   List<int> q3 = [];
@@ -38,11 +40,25 @@ class _ScreenOneState extends State<ScreenOne> {
 
   int right = 0;
   int wrong = 0;
-  String itemResult = '';
-  bool isTimer = false;
-  // int count = 0;
+  bool isTimer = true;
 
   List<int> selected = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
+
+  int count = 0;
+  List<String> results = [];
+
+  List<bool> isShow = [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+  ];
 
   void generate() {
     for (int i = 0; i < 2; i++) {
@@ -63,8 +79,7 @@ class _ScreenOneState extends State<ScreenOne> {
     setState(() {
       right = 0;
       wrong = 0;
-      // isTimer = true;
-      // count ++;
+      // isTimer = false;
       selected.clear();
       isAnswer1.clear();
       q1.clear();
@@ -90,6 +105,19 @@ class _ScreenOneState extends State<ScreenOne> {
         false,
         false
       ]);
+      isShow.clear();
+      isShow.addAll([
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]);
       generate();
     });
   }
@@ -97,6 +125,19 @@ class _ScreenOneState extends State<ScreenOne> {
   int largeNumber(int n1, int n2) {
     int large = max(n1, n2);
     return large;
+  }
+
+  //     int smallNumber(int n1, int n2) {
+  //   int small = min(n1, n2);
+  //   return small;
+  // }
+
+  String totalResults() {
+    String str = '';
+    for (int i = 0; i < results.length; i++) {
+      str += '${languageChange((i + 1).toString())}။ ${results[i]} \n';
+    }
+    return str;
   }
 
   @override
@@ -112,32 +153,36 @@ class _ScreenOneState extends State<ScreenOne> {
         title: const Text('Screen One'),
       ),
       body: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-               Center(child: Text('မည်သည့်ကိန်းဂဏန်းက ကြီးသနည်း။')),
-              // CircleAvatar(child: isTimer? tweenTimer(15) : tweenTimer(5))
-            ],
-          ),
-        ),
-        
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(languageChange('မှန်-$right | မှား-$wrong')),
-              OutlinedButton(
-                  onPressed: () {
-                    restart();
-                  },
-                  child: const Text('ပြန်စမည်'))
+              const Center(child: Text('မည်သည့်ကိန်းဂဏန်းက ကြီးသနည်း။')),
+              CircleAvatar(
+                  child: isTimer ? tweenTimer(30, 1) : const Text('?'))
+            
             ],
           ),
         ),
-        
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.topRight,
+            children: [
+              OutlinedButton(
+                  onPressed: () {
+                    resultDialog(str: totalResults());
+                  },
+                  child: const Text('ရလဒ်များ')),
+                  Positioned(  
+                    top: -5,
+                    right: -5,
+                    child: count ==0? const Text('') : CircleAvatar(child: Text(languageChange('$count'), style: const TextStyle(color: Colors.white, fontSize: 13),), radius: 12, backgroundColor: Colors.red,))
+            ],
+          ),
+        ),
         Expanded(
           child: ListView(
             children: [
@@ -192,7 +237,16 @@ class _ScreenOneState extends State<ScreenOne> {
                           wrong++;
                           // print('worong => $wrong');
                         }
-                        resultDialog();
+                        if (right + wrong == 10) {
+                          count++;
+                          isTimer = !isTimer;  
+
+                          resultDialog(
+                              str:
+                                  'အဖြေမှန်-> ${languageChange(right.toString())} | မှား-> ${languageChange(wrong.toString())}');
+                          results.add(languageChange('မှန် = ($right) ခု + မှား = ($wrong) ခု'));
+                        restart();
+                        }
                       });
                     },
               child: selected[no - 1] == num1
@@ -217,7 +271,17 @@ class _ScreenOneState extends State<ScreenOne> {
                           wrong++;
                           // print('worong => $wrong');
                         }
-                        resultDialog();
+                        if (right + wrong == 10) {
+                          count++;
+                          isTimer = !isTimer;                            
+
+                          // print(isTimer);
+                          resultDialog(
+                              str:
+                                  'အဖြေမှန်-> ${languageChange(right.toString())} | မှား-> ${languageChange(wrong.toString())}');
+                          results.add(languageChange('မှန် = ($right) ခု + မှား = ($wrong) ခု'));
+                          restart();
+                        }
                       });
                     },
               child: selected[no - 1] == num2
@@ -226,31 +290,42 @@ class _ScreenOneState extends State<ScreenOne> {
                       style: const TextStyle(color: Colors.blue),
                     )
                   : Text(languageChange(num2.toString()))),
+          isShow[no - 1]
+              ? Text(languageChange(largeNumber(num1, num2).toString()))
+              : InkWell(
+                  onTap: () => setState(() {
+                        isShow[no - 1] = true;
+                      }),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.amber.shade200,
+                    child: const Text('?'),
+                  ))
         ],
       ),
     );
   }
 
-  void resultDialog() {
-    if (right + wrong == 10) {
-      showDialog(
-        context: (context),
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('ရလဒ်များ'),
-            content: Text(
-                'အဖြေမှန်-> ${languageChange(right.toString())} | မှား-> ${languageChange(wrong.toString())}'),
-            actions: [
-              OutlinedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('ပိတ်မည်'))
-            ],
-          );
-        },
-      );
-    }
+  void resultDialog({required String str}) {
+    showDialog(
+      barrierDismissible: false,
+      context: (context),
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('ရလဒ်များ'),
+          content: Text(str),
+          actions: [
+            OutlinedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    isTimer = true;
+                  });
+                },
+                child: const Text('ပိတ်မည်'))
+          ],
+        );
+      },
+    );
   }
-  
-  }
+
+}
