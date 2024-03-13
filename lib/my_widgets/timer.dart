@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:kids_math_homework/main.dart';
 import 'package:kids_math_homework/my_widgets/mm_language_change.dart';
 
-Widget tweenTimer( int seconds, int key,{int? minutes}){    
+Widget tweenTimer({required int seconds,int? minutes}){    
   return Builder(
-     key: ValueKey(key),
+    //  key: ValueKey(key),
     builder: (context) {
       return TweenAnimationBuilder(
                     tween: Tween(
@@ -29,16 +29,13 @@ Widget tweenTimer( int seconds, int key,{int? minutes}){
                   child: const Text('ကစားမည်')),
               OutlinedButton(
                   onPressed: () {
-                    
                       Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=> const MyHome()),ModalRoute.withName('/'));
                   },
                   child: const Text('ထွက်မည်')),
-
             ],
           );
         },
       );
-
                       },
                      duration: Duration(minutes: minutes?? 0, seconds: seconds),
                       builder: (context, duration, child){

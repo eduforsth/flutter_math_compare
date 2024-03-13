@@ -1,9 +1,12 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:kids_math_homework/controller.dart';
+import 'package:kids_math_homework/detail_screen/dialog/show_dialog.dart';
+import 'package:kids_math_homework/detail_screen/title/question_title.dart';
 import 'package:kids_math_homework/my_widgets/mm_language_change.dart';
-import 'package:kids_math_homework/my_widgets/timer.dart';
-import 'package:kids_math_homework/random.dart';
+import 'package:kids_math_homework/my_widgets/random.dart';
+import 'package:kids_math_homework/my_widgets/total_results.dart';
+import 'package:provider/provider.dart';
 
 class ScreenTwo extends StatefulWidget {
   const ScreenTwo({super.key});
@@ -13,7 +16,6 @@ class ScreenTwo extends StatefulWidget {
 }
 
 class ScreenTwoState extends State<ScreenTwo> {
-
   List<int> q1 = [];
   List<int> q2 = [];
   List<int> q3 = [];
@@ -25,301 +27,285 @@ class ScreenTwoState extends State<ScreenTwo> {
   List<int> q9 = [];
   List<int> q10 = [];
 
-  List<bool> isAnswer1 = [
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false
-  ];
+  List<List<int>> questions = [];
+  List<int> selectedQ = [];
+
+  int ans1 = 0;
+  int ans2 = 0;
+  int ans3 = 0;
+  int ans4 = 0;
+  int ans5 = 0;
+  int ans6 = 0;
+  int ans7 = 0;
+  int ans8 = 0;
+  int ans9 = 0;
+  int ans10 = 0;
+
+  List<int> answers = [];
 
   int right = 0;
   int wrong = 0;
+
+  String trueAndFalseAnswer = '';
+  String totalAnswer = '';
   bool isTimer = true;
-
-  List<int> selected = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
-
   int count = 0;
-  List<String> results = [];
 
-  List<bool> isShow = [
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false
-  ];
-
-  void generate() {
-    for (int i = 0; i < 2; i++) {
-      q1.add(randomGenerate());
-      q2.add(randomGenerate());
-      q3.add(randomGenerate());
-      q4.add(randomGenerate());
-      q5.add(randomGenerate());
-      q6.add(randomGenerate());
-      q7.add(randomGenerate());
-      q8.add(randomGenerate());
-      q9.add(randomGenerate());
-      q10.add(randomGenerate());
-    }
-  }
-
-  void restart() {
+  void increment() {
     setState(() {
-      right = 0;
-      wrong = 0;
-      // isTimer = false;
-      selected.clear();
-      isAnswer1.clear();
-      q1.clear();
-      q2.clear();
-      q3.clear();
-      q4.clear();
-      q5.clear();
-      q6.clear();
-      q7.clear();
-      q8.clear();
-      q9.clear();
-      q10.clear();
-      selected.addAll([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
-      isAnswer1.addAll([
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ]);
-      isShow.clear();
-      isShow.addAll([
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ]);
-      generate();
+      ++right;
+      trueAndFalseAnswer += 'မှန် ။';
     });
   }
 
-      int smallNumber(int n1, int n2) {
-    int small = min(n1, n2);
-    return small;
+  void decrement() {
+    setState(() {
+      ++wrong;
+      trueAndFalseAnswer += 'မှား ။';
+    });
   }
 
-  String totalResults() {
-    String str = '';
-    for (int i = 0; i < results.length; i++) {
-      str += '${languageChange((i + 1).toString())}။ ${results[i]} \n';
+  int smallNumber(int n1, int n2) {
+    int large = min(n1, n2);
+    return large;
+  }
+
+  void checkResult() {
+    List<int> cAnswerList = [];
+
+    for (int i = 0; i < answers.length; i++) {
+      // true answer
+      int cAnswer = smallNumber(questions[i][0], questions[i][1]);
+      //user answer add to list
+      answers[i] = selectedQ[i];
+      //true answer add to list
+      cAnswerList.add(cAnswer);
+
+      if (answers[i] == cAnswerList[i]) {
+        increment();
+      } else {
+        decrement();
+      }
     }
-    return str;
+
+    if (answers.length == (right + wrong)) {
+      //show Result with Dialog
+
+      // totalResultDialog(
+      //     text: Text(
+      //         '${totalResults(trueAndFalseAnswer)} \n မှန် ($right)ခု + မှား ($wrong)ခု = (${right + wrong}) ခု'
+      //             .toMM()),
+      //     timer: true);
+      Dialogs.showMyDialog(
+        text: Consumer<MyProvider>(builder: (_, myProvider, child) {
+          return Text(
+              '${totalResults(trueAndFalseAnswer)} \n မှန် ($right)ခု + မှား ($wrong)ခု = (${right + wrong}) ခု'
+                  .toMM());
+        }),
+        parentContext: context,
+        onPressed: () {
+          Navigator.pushAndRemoveUntil(
+              context,
+              PageRouteBuilder(
+                  transitionDuration: Duration.zero,
+                  pageBuilder: (_, __, ___) => const ScreenTwo()),
+              ModalRoute.withName('/'));
+          setState(() {
+            isTimer = true;
+          });
+        },
+      );
+
+      //adding results to String
+      totalAnswer += 'မှန်-$right + မှား-$wrong ။';
+
+      Provider.of<MyProvider>(context, listen: false).answerSave2(totalAnswer);
+      Provider.of<MyProvider>(context, listen: false).increment2();
+      isTimer = !isTimer;
+    }
+  }
+
+  void generate() {
+    // questions List with array containing two paras
+    List.generate(10, (index) => questions[index] = randomGenerateList(2));
+    // user selected Answers List
+    selectedQ = List.generate(10, (index) => questions[index][0]);
   }
 
   @override
   void initState() {
-    super.initState();
+    questions = [q1, q2, q3, q4, q5, q6, q7, q8, q9, q10];
+    answers = [
+      ans1,
+      ans2,
+      ans3,
+      ans4,
+      ans5,
+      ans6,
+      ans7,
+      ans8,
+      ans9,
+      ans10,
+    ];
     generate();
+
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Screen Two'),
-      ),
-      body: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              const Center(child: Text('မည်သည့်ကိန်းဂဏန်းက ငယ်သနည်း။')),
-              CircleAvatar(
-                  child: isTimer ? tweenTimer(30, 1) : const Text('?'))
-            
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.topRight,
-            children: [
-              OutlinedButton(
-                  onPressed: () {
-                    resultDialog(str: totalResults());
-                  },
-                  child: const Text('ရလဒ်များ')),
-                  Positioned(  
-                    top: -5,
-                    right: -5,
-                    child: count ==0? const Text('') : CircleAvatar(child: Text(languageChange('$count'), style: const TextStyle(color: Colors.white, fontSize: 13),), radius: 12, backgroundColor: Colors.red,))
-            ],
-          ),
-        ),
-        Expanded(
-          child: ListView(
-            children: [
-              answerRow(no: 1, num1: q1[0], num2: q1[1], check: isAnswer1[0]),
-              answerRow(no: 2, num1: q2[0], num2: q2[1], check: isAnswer1[1]),
-              answerRow(no: 3, num1: q3[0], num2: q3[1], check: isAnswer1[2]),
-              answerRow(no: 4, num1: q4[0], num2: q4[1], check: isAnswer1[3]),
-              answerRow(no: 5, num1: q5[0], num2: q5[1], check: isAnswer1[4]),
-              answerRow(no: 6, num1: q6[0], num2: q6[1], check: isAnswer1[5]),
-              answerRow(no: 7, num1: q7[0], num2: q7[1], check: isAnswer1[6]),
-              answerRow(no: 8, num1: q8[0], num2: q8[1], check: isAnswer1[7]),
-              answerRow(no: 9, num1: q9[0], num2: q9[1], check: isAnswer1[8]),
-              answerRow(
-                  no: 10, num1: q10[0], num2: q10[1], check: isAnswer1[9]),
-            ],
-          ),
-        )
-      ]),
-    );
-  }
-
-  Widget answerRow(
-      {required int no,
-      required int num1,
-      required int num2,
-      required bool check}) {
-    return Container(
-      padding: const EdgeInsets.all(5),
-      margin: const EdgeInsets.all(5),
-      decoration:
-          BoxDecoration(border: Border.all(color: Colors.grey.shade400)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      appBar: AppBar(title: const Text('Screen three')),
+      body: Column(
         children: [
-          CircleAvatar(
-            child: Text(languageChange('$no')),
+          Container(
+            margin: const EdgeInsets.all(15),
+            height: 120,
+            width: double.infinity,
+            decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(15)),
+            child: Center(
+                child: Column(
+              children: [
+                QuestionTitle(text: 'မည်သည့်ကိန်းက ငယ်သနည်း', isTimer: isTimer),
+                Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.topRight,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () {
+                        Dialogs.showMyDialog(
+                          text: Consumer<MyProvider>(
+                              builder: (_, myProvider, child) {
+                            return Text(
+                                totalResults(myProvider.answerString2).toMM());
+                          }),
+                          parentContext: context,
+                          onPressed: () {
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                PageRouteBuilder(
+                                    transitionDuration: Duration.zero,
+                                    pageBuilder: (_, __, ___) =>
+                                        const ScreenTwo()),
+                                ModalRoute.withName('/'));
+                            setState(() {
+                              isTimer = true;
+                            });
+                          },
+                        );
+                      },
+                      child: const Text('ရလဒ်များ'),
+                    ),
+                    Positioned(
+                        top: -5,
+                        right: -5,
+                        child: Consumer<MyProvider>(
+                            builder: (_, myProvider, child) {
+                          return myProvider.count2 == 0
+                              ? const Text('')
+                              : CircleAvatar(
+                                  radius: 12,
+                                  backgroundColor: Colors.red,
+                                  child: Text(
+                                    // '${context.read<myController>().count}',
+                                    '${myProvider.count2}',
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 13),
+                                  ),
+                                );
+                        }))
+                  ],
+                ),
+              ],
+            )),
           ),
-          const SizedBox(
-            width: 20,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  for (int i = 0; i < questions.length; i++)
+                    questionsRow(
+                      idx: i,
+                      question: questions[i],
+                      answer: answers[i],
+                    )
+                ],
+              ),
+            ),
           ),
-          OutlinedButton(
-              onPressed: check
-                  ? null
-                  : () {
-                      setState(() {
-                        isAnswer1[no - 1] = true;
-                        selected[no - 1] = num1;
-                        if (smallNumber(num1, num2) == num1) {
-                          right++;
-                          // print('right => $right');
-                        } else {
-                          wrong++;
-                          // print('worong => $wrong');
-                        }
-                        if (right + wrong == 10) {
-                          count++;
-                          isTimer = !isTimer;  
-
-                          resultDialog(
-                              str:
-                                  'အဖြေမှန်-> ${languageChange(right.toString())} | မှား-> ${languageChange(wrong.toString())}');
-                          results.add(languageChange('မှန် = ($right) ခု + မှား = ($wrong) ခု'));
-                        restart();
-                        }
-                      });
-                    },
-              child: selected[no - 1] == num1
-                  ? Text(
-                      languageChange(
-                        num1.toString(),
-                      ),
-                      style: const TextStyle(color: Colors.blue),
-                    )
-                  : Text(languageChange(num1.toString()))),
-          OutlinedButton(
-              onPressed: check
-                  ? null
-                  : () {
-                      setState(() {
-                        isAnswer1[no - 1] = true;
-                        selected[no - 1] = num2;
-                        if (smallNumber(num1, num2) == num2) {
-                          right++;
-                          // print('right => $right');
-                        } else {
-                          wrong++;
-                          // print('worong => $wrong');
-                        }
-                        if (right + wrong == 10) {
-                          count++;
-                          isTimer = !isTimer;                            
-
-                          print(isTimer);
-                          resultDialog(
-                              str:
-                                  'အဖြေမှန်-> ${languageChange(right.toString())} | မှား-> ${languageChange(wrong.toString())}');
-                          results.add(languageChange('မှန် = ($right) ခု + မှား = ($wrong) ခု'));
-                          restart();
-                        }
-                      });
-                    },
-              child: selected[no - 1] == num2
-                  ? Text(
-                      languageChange(num2.toString()),
-                      style: const TextStyle(color: Colors.blue),
-                    )
-                  : Text(languageChange(num2.toString()))),
-          isShow[no - 1]
-              ? Text(languageChange(smallNumber(num1, num2).toString()))
-              : InkWell(
-                  onTap: () => setState(() {
-                        isShow[no - 1] = true;
-                      }),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.amber.shade200,
-                    child: const Text('?'),
-                  ))
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          checkResult();
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
-  void resultDialog({required String str}) {
-    showDialog(
-      barrierDismissible: false,
-      context: (context),
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('ရလဒ်များ'),
-          content: Text(str),
-          actions: [
-            OutlinedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    isTimer = true;
-                  });
-                },
-                child: const Text('ပိတ်မည်'))
-          ],
-        );
-      },
+  Widget questionsRow({
+    required int idx,
+    required List<int> question,
+    required int answer,
+    // required bool enable,
+  }) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.only(top: 3),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20), color: Colors.grey.shade200),
+      child: Column(
+        children: [
+          CircleAvatar(
+            child: Text((idx + 1).toString().toMM()),
+          ),
+          Row(
+            children: [
+              const Spacer(),
+              Container(
+                height: 80,
+                width: 200,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.grey.shade200),
+                child: GridView.builder(
+                    primary: false,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 50,
+                            crossAxisSpacing: 50),
+                    itemCount: question.length,
+                    itemBuilder: (context, index) {
+                      return Row(
+                        children: [
+                          Radio<int>(
+                              value: question[index],
+                              groupValue: selectedQ[idx],
+                              onChanged: (val) {
+                                setState(() {
+                                  selectedQ[idx] = val!;
+                                  debugPrint(selectedQ[idx].toString());
+                                });
+                              }),
+                          selectedQ[idx] == question[index]
+                              ? Text(
+                                  question[index].toString().toMM(),
+                                  style: const TextStyle(fontSize: 18),
+                                )
+                              : Text(question[index].toString().toMM())
+                        ],
+                      );
+                    }),
+              ),
+              const Spacer()
+            ],
+          ),
+        ],
+      ),
     );
   }
 
