@@ -14,23 +14,25 @@ class Body extends StatelessWidget {
         children: [
           const Padding(
             padding:  EdgeInsets.all(18.0),
-            child: Text('Kids Math Game Update', style: TextStyle(fontSize: 18),),
+            child: Text('Update Date - 13.03.24', style: TextStyle(fontSize: 18),),
           ),
-          GridView(
-            shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10
+          Expanded(
+            child: GridView(
+              shrinkWrap: true,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 5,
+                mainAxisSpacing: 5
+            ),
+                children: [
+                  customContainer(num: 1, text: 'ကြီးသောကိန်း', press: const ScreenOne()),
+                  customContainer(num: 2, text: 'ငယ်သောကိန်း', press: const ScreenTwo()),
+                  customContainer(num: 3, text: 'ကြီးစဉ်ငယ်လိုက်', press: const ScreenThree()),
+                  customContainer(num: 4, text: 'ငယ်စဉ်ကြီးလိုက်', press: const ScreenFour()),
+                  
+                ],
+                ),
           ),
-              children: [
-                customContainer(num: 1, text: 'ကြီးသောကိန်း', press: const ScreenOne()),
-                customContainer(num: 2, text: 'ငယ်သောကိန်း', press: const ScreenTwo()),
-                customContainer(num: 3, text: 'ကြီးစဉ်ငယ်လိုက်', press: const ScreenThree()),
-                customContainer(num: 4, text: 'ငယ်စဉ်ကြီးလိုက်', press: const ScreenFour()),
-                
-              ],
-              ),
         ],
       )
     );
@@ -43,8 +45,6 @@ class Body extends StatelessWidget {
           onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=> press!)),
           child: Container(
             margin: const EdgeInsets.all(10),
-                  width: 200,
-                   height: 200,
                    decoration: BoxDecoration(
                     color: Colors.cyan,
                      borderRadius: num.isEven? const BorderRadius.only(topLeft: Radius.circular(30), bottomRight: Radius.circular(30)) : const BorderRadius.only(topRight: Radius.circular(30), bottomLeft: Radius.circular(30))

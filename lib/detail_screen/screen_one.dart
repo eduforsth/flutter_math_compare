@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:kids_math_homework/controller.dart';
+import 'package:kids_math_homework/detail_screen/dialog/show_dialog.dart';
 import 'package:kids_math_homework/detail_screen/title/question_title.dart';
 import 'package:kids_math_homework/my_widgets/mm_language_change.dart';
 import 'package:kids_math_homework/my_widgets/random.dart';
@@ -49,10 +50,6 @@ class _ScreenOneState extends State<ScreenOne> {
   bool isTimer = true;
   int count = 0;
   List<bool> enableList = List.generate(10, (index) => true);
-  // List<bool> enableList = [true, true, true, true, true, true, true, true, true, true];
-  bool isEnable = true;
-
-  late VoidCallback cancelListening;
 
   void increment() {
     setState(() {
@@ -82,12 +79,26 @@ class _ScreenOneState extends State<ScreenOne> {
     }
 
     if (answers.length == (right + wrong)) {
-      //show Result with Dialog
-      totalResultDialog(
-          text: Text(
+      Dialogs.showMyDialog(
+        text: Consumer<MyProvider>(builder: (_, myProvider, child) {
+          return Text(
               '${totalResults(trueAndFalseAnswer)} \n မှန် ($right)ခု + မှား ($wrong)ခု = (${right + wrong}) ခု'
-                  .toMM()),
-          timer: true);
+                  .toMM());
+        }),
+        parentContext: context,
+        onPressed: () {
+          Navigator.pushAndRemoveUntil(
+              context,
+              PageRouteBuilder(
+                  transitionDuration: Duration.zero,
+                  pageBuilder: (_, __, ___) => const ScreenOne()),
+              ModalRoute.withName('/'));
+          setState(() {
+            isTimer = true;
+          });
+        },
+      );
+
       //adding results to String
       totalAnswer += 'မှန်-$right + မှား-$wrong ။';
 
@@ -124,7 +135,7 @@ class _ScreenOneState extends State<ScreenOne> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Screen three')),
+        appBar: AppBar(title: const Text('Screen One')),
         body: Column(
           children: [
             Container(
@@ -145,14 +156,26 @@ class _ScreenOneState extends State<ScreenOne> {
                     children: [
                       OutlinedButton(
                         onPressed: () {
-                          totalResultDialog(
-                              text: Consumer<MyProvider>(
-                                  builder: (_, myProvider, child) {
-                                return Text(
-                                    totalResults(myProvider.answerString1)
-                                        .toMM());
-                              }),
-                              timer: true);
+                          Dialogs.showMyDialog(
+                            text: Consumer<MyProvider>(
+                                builder: (_, myProvider, child) {
+                              return Text(totalResults(myProvider.answerString1)
+                                  .toMM());
+                            }),
+                            parentContext: context,
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  PageRouteBuilder(
+                                      transitionDuration: Duration.zero,
+                                      pageBuilder: (_, __, ___) =>
+                                          const ScreenOne()),
+                                  ModalRoute.withName('/'));
+                              setState(() {
+                                isTimer = true;
+                              });
+                            },
+                          );
                         },
                         child: const Text('ရလဒ်များ'),
                       ),
@@ -185,7 +208,10 @@ class _ScreenOneState extends State<ScreenOne> {
                   children: [
                     for (int i = 0; i < questions.length; i++)
                       questionsRow(
-                          no: i + 1, question: questions[i], answer: answers[i], enable: enableList[i])
+                          no: i + 1,
+                          question: questions[i],
+                          answer: answers[i],
+                          enable: enableList[i])
                   ],
                 ),
               ),
@@ -221,58 +247,35 @@ class _ScreenOneState extends State<ScreenOne> {
                     color: Colors.grey.shade200),
                 child: GridView.builder(
                     primary: false,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, mainAxisSpacing: 50, crossAxisSpacing: 50),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 50,
+                            crossAxisSpacing: 50),
                     itemCount: question.length,
                     itemBuilder: (context, index) {
-                  return  OutlinedButton(
-                       onPressed: !enable
-                          ? null
-                          : () {
-                            setState(() {
-                               enableList[no-1] = false;
-                              answer = question[index];
-                              checkResult(question[0], question[1], answer);                          
-                            });
-                            },
-                       child: Text(question[index].toString().toMM(), style: const TextStyle(fontSize: 16),),);
-                  
+                      return OutlinedButton(
+                        onPressed: !enable
+                            ? null
+                            : () {
+                                setState(() {
+                                  enableList[no - 1] = false;
+                                  answer = question[index];
+                                  checkResult(question[0], question[1], answer);
+                                });
+                              },
+                        child: Text(
+                          question[index].toString().toMM(),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      );
                     }),
               ),
               const Spacer()
             ],
           ),
-        
         ],
       ),
-    );
-  }
-
-  void totalResultDialog({required Widget text, required bool timer}) {
-    showDialog(
-      barrierDismissible: false,
-      context: (context),
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('ရလဒ်များ'),
-          content: SingleChildScrollView(child: text),
-          actions: [
-            OutlinedButton(
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      PageRouteBuilder(
-                          transitionDuration: Duration.zero,
-                          pageBuilder: (_, __, ___) => const ScreenOne()),
-                      ModalRoute.withName('/'));
-                  setState(() {
-                    isTimer = timer;
-                  });
-                },
-                child: const Text('ပိတ်မည်')),
-          ],
-        );
-      },
     );
   }
 }

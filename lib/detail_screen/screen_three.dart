@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kids_math_homework/controller.dart';
+import 'package:kids_math_homework/detail_screen/dialog/show_dialog.dart';
 import 'package:kids_math_homework/detail_screen/title/question_title.dart';
 import 'package:kids_math_homework/my_widgets/buttons/puzzel_btn.dart';
 import 'package:kids_math_homework/my_widgets/mm_language_change.dart';
@@ -27,7 +28,7 @@ class _ScreenThreeState extends State<ScreenThree> {
   List<int> q9 = [];
   List<int> q10 = [];
 
-   List<List<int>> questions = [];
+  List<List<int>> questions = [];
 
   List<int> ans1 = [];
   List<int> ans2 = [];
@@ -40,7 +41,7 @@ class _ScreenThreeState extends State<ScreenThree> {
   List<int> ans9 = [];
   List<int> ans10 = [];
 
-List<List<int>> answers = [];
+  List<List<int>> answers = [];
 
   int right = 0;
   int wrong = 0;
@@ -48,7 +49,6 @@ List<List<int>> answers = [];
   String trueAndFalseAnswer = '';
   String totalAnswer = '';
   bool isTimer = true;
-  int count = 0;
 
   void increment() {
     setState(() {
@@ -90,7 +90,7 @@ List<List<int>> answers = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Screen three')),
+        appBar: AppBar(title: const Text('Screen Three')),
         body: Column(
           children: [
             Container(
@@ -103,21 +103,37 @@ List<List<int>> answers = [];
               child: Center(
                   child: Column(
                 children: [
-                  QuestionTitle(text: 'ကြီးစဉ်ငယ်လိုက်စီပါ', isTimer: isTimer, minutes: 1,),
+                  QuestionTitle(
+                    text: 'ကြီးစဉ်ငယ်လိုက်စီပါ',
+                    isTimer: isTimer,
+                    minutes: 1,
+                  ),
                   Stack(
                     clipBehavior: Clip.none,
                     alignment: Alignment.topRight,
                     children: [
                       OutlinedButton(
                         onPressed: () {
-                          totalResultDialog(
-                              text: Consumer<MyProvider>(
-                                  builder: (_, myProvider, child) {
-                                return Text(
-                                    totalResults(myProvider.answerString3)
-                                        .toMM());
-                              }),
-                              timer: true);
+                          Dialogs.showMyDialog(
+                            text: Consumer<MyProvider>(
+                                builder: (_, myProvider, child) {
+                              return Text(totalResults(myProvider.answerString3)
+                                  .toMM());
+                            }),
+                            parentContext: context,
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  PageRouteBuilder(
+                                      transitionDuration: Duration.zero,
+                                      pageBuilder: (_, __, ___) =>
+                                          const ScreenThree()),
+                                  ModalRoute.withName('/'));
+                              setState(() {
+                                isTimer = true;
+                              });
+                            },
+                          );
                         },
                         child: const Text('ရလဒ်များ'),
                       ),
@@ -199,12 +215,28 @@ List<List<int>> answers = [];
                         }
 
                         if (answers.length == (right + wrong)) {
-                          //show Result with Dialog
-                          totalResultDialog(
-                              text: Text(
+                          Dialogs.showMyDialog(
+                            text: Consumer<MyProvider>(
+                                builder: (_, myProvider, child) {
+                              return Text(
                                   '${totalResults(trueAndFalseAnswer)} \n မှန် ($right)ခု + မှား ($wrong)ခု = (${right + wrong}) ခု'
-                                      .toMM()),
-                              timer: true);
+                                      .toMM());
+                            }),
+                            parentContext: context,
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  PageRouteBuilder(
+                                      transitionDuration: Duration.zero,
+                                      pageBuilder: (_, __, ___) =>
+                                          const ScreenThree()),
+                                  ModalRoute.withName('/'));
+                              setState(() {
+                                isTimer = true;
+                              });
+                            },
+                          );
+
                           //adding results to String
                           totalAnswer += 'မှန်-$right + မှား-$wrong ။';
 
@@ -220,48 +252,9 @@ List<List<int>> answers = [];
                     // isEnable: false,
                   );
                 }),
-          
           ),
         ],
       ),
-    );
-  }
-
-  void totalResultDialog({required Widget text, required bool timer}) {
-    showDialog(
-      barrierDismissible: false,
-      context: (context),
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('ရလဒ်များ'),
-          content: SingleChildScrollView(child: text),
-          actions: [
-            OutlinedButton(
-                onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      
-                        context,
-                        PageRouteBuilder(
-                            transitionDuration: Duration.zero,
-                            pageBuilder: (_, __, ___) => const ScreenThree()),
-                            ModalRoute.withName('/')
-                            );
-                  setState(() {
-                    isTimer = timer;
-                    // Navigator.pushReplacement(
-                    //     context,
-                    //     PageRouteBuilder(
-                    //         transitionDuration: Duration.zero,
-                    //         pageBuilder: (_, __, ___) => const ScreenThree())
-                            // );
-                    
-                    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const ScreenThree()));
-                  });
-                },
-                child: const Text('ပိတ်မည်')),
-          ],
-        );
-      },
     );
   }
 }

@@ -28,6 +28,7 @@ class ScreenTwoState extends State<ScreenTwo> {
   List<int> q10 = [];
 
   List<List<int>> questions = [];
+  //selected question default in radio
   List<int> selectedQ = [];
 
   int ans1 = 0;
@@ -46,10 +47,10 @@ class ScreenTwoState extends State<ScreenTwo> {
   int right = 0;
   int wrong = 0;
 
+//to show single list dialog
   String trueAndFalseAnswer = '';
   String totalAnswer = '';
   bool isTimer = true;
-  int count = 0;
 
   void increment() {
     setState(() {
@@ -89,13 +90,6 @@ class ScreenTwoState extends State<ScreenTwo> {
     }
 
     if (answers.length == (right + wrong)) {
-      //show Result with Dialog
-
-      // totalResultDialog(
-      //     text: Text(
-      //         '${totalResults(trueAndFalseAnswer)} \n မှန် ($right)ခု + မှား ($wrong)ခု = (${right + wrong}) ခု'
-      //             .toMM()),
-      //     timer: true);
       Dialogs.showMyDialog(
         text: Consumer<MyProvider>(builder: (_, myProvider, child) {
           return Text(
@@ -148,14 +142,13 @@ class ScreenTwoState extends State<ScreenTwo> {
       ans10,
     ];
     generate();
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Screen three')),
+      appBar: AppBar(title: const Text('Screen Two')),
       body: Column(
         children: [
           Container(
@@ -231,6 +224,7 @@ class ScreenTwoState extends State<ScreenTwo> {
                       question: questions[i],
                       answer: answers[i],
                     )
+
                 ],
               ),
             ),
@@ -241,7 +235,7 @@ class ScreenTwoState extends State<ScreenTwo> {
         onPressed: () {
           checkResult();
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.question_mark_outlined),
       ),
     );
   }
@@ -308,5 +302,4 @@ class ScreenTwoState extends State<ScreenTwo> {
       ),
     );
   }
-
 }
