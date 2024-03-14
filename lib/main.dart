@@ -3,6 +3,9 @@ import 'package:kids_math_homework/body.dart';
 import 'package:kids_math_homework/controller.dart';
 import 'package:provider/provider.dart';
 
+typedef iLs = List<int>;
+// typedef ilLs = List<List<int>>;
+
 void main() => runApp( const MyApp());
 
 class MyApp extends StatelessWidget {

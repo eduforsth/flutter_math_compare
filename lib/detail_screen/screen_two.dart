@@ -1,8 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:kids_math_homework/controller.dart';
+import 'package:kids_math_homework/detail_screen/buttons/question2_row.dart';
 import 'package:kids_math_homework/detail_screen/dialog/show_dialog.dart';
 import 'package:kids_math_homework/detail_screen/title/question_title.dart';
+import 'package:kids_math_homework/main.dart';
 import 'package:kids_math_homework/my_widgets/mm_language_change.dart';
 import 'package:kids_math_homework/my_widgets/random.dart';
 import 'package:kids_math_homework/my_widgets/total_results.dart';
@@ -16,33 +18,12 @@ class ScreenTwo extends StatefulWidget {
 }
 
 class ScreenTwoState extends State<ScreenTwo> {
-  List<int> q1 = [];
-  List<int> q2 = [];
-  List<int> q3 = [];
-  List<int> q4 = [];
-  List<int> q5 = [];
-  List<int> q6 = [];
-  List<int> q7 = [];
-  List<int> q8 = [];
-  List<int> q9 = [];
-  List<int> q10 = [];
+  List<iLs> questions = [[], [], [], [], [], [], [], [], [], [], ];
 
-  List<List<int>> questions = [];
   //selected question default in radio
-  List<int> selectedQ = [];
+  iLs selectedQ = [];
 
-  int ans1 = 0;
-  int ans2 = 0;
-  int ans3 = 0;
-  int ans4 = 0;
-  int ans5 = 0;
-  int ans6 = 0;
-  int ans7 = 0;
-  int ans8 = 0;
-  int ans9 = 0;
-  int ans10 = 0;
-
-  List<int> answers = [];
+  int answer = 0;
 
   int right = 0;
   int wrong = 0;
@@ -50,6 +31,7 @@ class ScreenTwoState extends State<ScreenTwo> {
 //to show single list dialog
   String trueAndFalseAnswer = '';
   String totalAnswer = '';
+
   bool isTimer = true;
 
   void increment() {
@@ -72,24 +54,23 @@ class ScreenTwoState extends State<ScreenTwo> {
   }
 
   void checkResult() {
-    List<int> cAnswerList = [];
-
-    for (int i = 0; i < answers.length; i++) {
+    iLs cAnswerList = [];
+    for (int i = 0; i < questions.length; i++) {
       // true answer
       int cAnswer = smallNumber(questions[i][0], questions[i][1]);
       //user answer add to list
-      answers[i] = selectedQ[i];
+      answer = selectedQ[i];
       //true answer add to list
       cAnswerList.add(cAnswer);
 
-      if (answers[i] == cAnswerList[i]) {
+      if (answer == cAnswerList[i]) {
         increment();
       } else {
         decrement();
       }
     }
 
-    if (answers.length == (right + wrong)) {
+    if (questions.length == (right + wrong)) {
       Dialogs.showMyDialog(
         text: Consumer<MyProvider>(builder: (_, myProvider, child) {
           return Text(
@@ -128,19 +109,6 @@ class ScreenTwoState extends State<ScreenTwo> {
 
   @override
   void initState() {
-    questions = [q1, q2, q3, q4, q5, q6, q7, q8, q9, q10];
-    answers = [
-      ans1,
-      ans2,
-      ans3,
-      ans4,
-      ans5,
-      ans6,
-      ans7,
-      ans8,
-      ans9,
-      ans10,
-    ];
     generate();
     super.initState();
   }
@@ -219,12 +187,35 @@ class ScreenTwoState extends State<ScreenTwo> {
               child: Column(
                 children: [
                   for (int i = 0; i < questions.length; i++)
-                    questionsRow(
-                      idx: i,
-                      question: questions[i],
-                      answer: answers[i],
-                    )
-
+Question2Row(no: i+1, child: GridView.builder(
+                    primary: false,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 50,
+                            crossAxisSpacing: 50),
+                    itemCount: questions[i].length,
+                    itemBuilder: (context, index) {
+                      return Row(
+                        children: [
+                          Radio<int>(
+                              value: questions[i][index],
+                              groupValue: selectedQ[i],
+                              onChanged: (val) {
+                                setState(() {
+                                  selectedQ[i] = val!;
+                                  debugPrint(selectedQ[i].toString());
+                                });
+                              }),
+                          selectedQ[i] == questions[i][index]
+                              ? Text(
+                                  questions[i][index].toString().toMM(),
+                                  style: const TextStyle(fontSize: 18),
+                                )
+                              : Text(questions[i][index].toString().toMM())
+                        ],
+                      );
+                    }),)
                 ],
               ),
             ),
@@ -240,66 +231,4 @@ class ScreenTwoState extends State<ScreenTwo> {
     );
   }
 
-  Widget questionsRow({
-    required int idx,
-    required List<int> question,
-    required int answer,
-    // required bool enable,
-  }) {
-    return Container(
-      margin: const EdgeInsets.all(10),
-      padding: const EdgeInsets.only(top: 3),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20), color: Colors.grey.shade200),
-      child: Column(
-        children: [
-          CircleAvatar(
-            child: Text((idx + 1).toString().toMM()),
-          ),
-          Row(
-            children: [
-              const Spacer(),
-              Container(
-                height: 80,
-                width: 200,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.grey.shade200),
-                child: GridView.builder(
-                    primary: false,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 50,
-                            crossAxisSpacing: 50),
-                    itemCount: question.length,
-                    itemBuilder: (context, index) {
-                      return Row(
-                        children: [
-                          Radio<int>(
-                              value: question[index],
-                              groupValue: selectedQ[idx],
-                              onChanged: (val) {
-                                setState(() {
-                                  selectedQ[idx] = val!;
-                                  debugPrint(selectedQ[idx].toString());
-                                });
-                              }),
-                          selectedQ[idx] == question[index]
-                              ? Text(
-                                  question[index].toString().toMM(),
-                                  style: const TextStyle(fontSize: 18),
-                                )
-                              : Text(question[index].toString().toMM())
-                        ],
-                      );
-                    }),
-              ),
-              const Spacer()
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }

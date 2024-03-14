@@ -14,7 +14,7 @@ class Body extends StatelessWidget {
         children: [
           const Padding(
             padding:  EdgeInsets.all(18.0),
-            child: Text('Update Date - 13.03.24', style: TextStyle(fontSize: 18),),
+            child: Text('Update Date - 14.03.24', style: TextStyle(fontSize: 18),),
           ),
           Expanded(
             child: GridView(

@@ -1,8 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:kids_math_homework/controller.dart';
+import 'package:kids_math_homework/detail_screen/buttons/question2_row.dart';
 import 'package:kids_math_homework/detail_screen/dialog/show_dialog.dart';
 import 'package:kids_math_homework/detail_screen/title/question_title.dart';
+import 'package:kids_math_homework/main.dart';
 import 'package:kids_math_homework/my_widgets/mm_language_change.dart';
 import 'package:kids_math_homework/my_widgets/random.dart';
 import 'package:kids_math_homework/my_widgets/total_results.dart';
@@ -16,31 +18,10 @@ class ScreenOne extends StatefulWidget {
 }
 
 class _ScreenOneState extends State<ScreenOne> {
-  List<int> q1 = [];
-  List<int> q2 = [];
-  List<int> q3 = [];
-  List<int> q4 = [];
-  List<int> q5 = [];
-  List<int> q6 = [];
-  List<int> q7 = [];
-  List<int> q8 = [];
-  List<int> q9 = [];
-  List<int> q10 = [];
 
-  List<List<int>> questions = [];
+  List<iLs> questions = [[], [], [], [], [], [], [], [], [], [], ];
 
-  int ans1 = 0;
-  int ans2 = 0;
-  int ans3 = 0;
-  int ans4 = 0;
-  int ans5 = 0;
-  int ans6 = 0;
-  int ans7 = 0;
-  int ans8 = 0;
-  int ans9 = 0;
-  int ans10 = 0;
-
-  List<int> answers = [];
+  int answer = 0;
 
   int right = 0;
   int wrong = 0;
@@ -48,7 +29,6 @@ class _ScreenOneState extends State<ScreenOne> {
   String trueAndFalseAnswer = '';
   String totalAnswer = '';
   bool isTimer = true;
-  int count = 0;
   List<bool> enableList = List.generate(10, (index) => true);
 
   void increment() {
@@ -78,7 +58,7 @@ class _ScreenOneState extends State<ScreenOne> {
       decrement();
     }
 
-    if (answers.length == (right + wrong)) {
+    if (questions.length == (right + wrong)) {
       Dialogs.showMyDialog(
         text: Consumer<MyProvider>(builder: (_, myProvider, child) {
           return Text(
@@ -105,29 +85,16 @@ class _ScreenOneState extends State<ScreenOne> {
       Provider.of<MyProvider>(context, listen: false).answerSave1(totalAnswer);
       Provider.of<MyProvider>(context, listen: false).increment1();
       isTimer = !isTimer;
-      // restart();
     }
   }
 
+//question-> 10 items
   void generate() {
     List.generate(10, (index) => questions[index] = randomGenerateList(2));
   }
 
   @override
   void initState() {
-    questions = [q1, q2, q3, q4, q5, q6, q7, q8, q9, q10];
-    answers = [
-      ans1,
-      ans2,
-      ans3,
-      ans4,
-      ans5,
-      ans6,
-      ans7,
-      ans8,
-      ans9,
-      ans10,
-    ];
     generate();
     super.initState();
   }
@@ -207,11 +174,31 @@ class _ScreenOneState extends State<ScreenOne> {
                 child: Column(
                   children: [
                     for (int i = 0; i < questions.length; i++)
-                      questionsRow(
-                          no: i + 1,
-                          question: questions[i],
-                          answer: answers[i],
-                          enable: enableList[i])
+                      Question2Row(no: i+1, child: GridView.builder(
+                    primary: false,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 50,
+                            crossAxisSpacing: 50),
+                    itemCount: questions[i].length,
+                    itemBuilder: (context, index) {
+                      return OutlinedButton(
+                        onPressed: !enableList[i]
+                            ? null
+                            : () {
+                                setState(() {
+                                  enableList[i] = false;
+                                  answer = questions[i][index];
+                                  checkResult(questions[i][0], questions[i][1], answer);
+                                });
+                              },
+                        child: Text(
+                          questions[i][index].toString().toMM(),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      );
+                    }),)
                   ],
                 ),
               ),
@@ -220,62 +207,4 @@ class _ScreenOneState extends State<ScreenOne> {
         ));
   }
 
-  Widget questionsRow({
-    required int no,
-    required List<int> question,
-    required int answer,
-    required bool enable,
-  }) {
-    return Container(
-      margin: const EdgeInsets.all(10),
-      padding: const EdgeInsets.only(top: 3),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20), color: Colors.grey.shade200),
-      child: Column(
-        children: [
-          CircleAvatar(
-            child: Text(no.toString().toMM()),
-          ),
-          Row(
-            children: [
-              const Spacer(),
-              Container(
-                height: 80,
-                width: 200,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.grey.shade200),
-                child: GridView.builder(
-                    primary: false,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 50,
-                            crossAxisSpacing: 50),
-                    itemCount: question.length,
-                    itemBuilder: (context, index) {
-                      return OutlinedButton(
-                        onPressed: !enable
-                            ? null
-                            : () {
-                                setState(() {
-                                  enableList[no - 1] = false;
-                                  answer = question[index];
-                                  checkResult(question[0], question[1], answer);
-                                });
-                              },
-                        child: Text(
-                          question[index].toString().toMM(),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      );
-                    }),
-              ),
-              const Spacer()
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }

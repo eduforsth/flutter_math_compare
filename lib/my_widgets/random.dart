@@ -1,13 +1,15 @@
 import 'dart:math';
 
+import 'package:kids_math_homework/main.dart';
+
 int randomGenerate(){
   Random random = Random();
   int number = random.nextInt(90) + 10;
   return number;
 }
 
-List<int> randomGenerateList(int count){
-  List<int> list ;
+iLs randomGenerateList(int count){
+  iLs list ;
     Random random = Random();
     list = List.generate(count, (index) => randomGenerate()); 
     if(list.toSet().length != count){

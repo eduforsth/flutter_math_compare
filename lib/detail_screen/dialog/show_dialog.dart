@@ -14,7 +14,7 @@ return showDialog(
                 onPressed: () {
                   onPressed();
                 },
-                child: const Text('ပိတ်မည်')),
+                child: const Icon(Icons.next_plan_outlined)),
           ],
         );
       },
