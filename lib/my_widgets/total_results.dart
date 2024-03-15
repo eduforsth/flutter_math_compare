@@ -3,7 +3,7 @@
 String totalResults(String string) {
     String str = '';
     List strList = string.split('။');
-    for (int i = 0; i < strList.length; i++) {
+    for (int i = 0; i < strList.length-1; i++) {
       str += '${(i + 1).toString().toMM()}။ ${strList[i]} \n';
     }
     return str;
