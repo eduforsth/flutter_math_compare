@@ -138,9 +138,10 @@ class _ScreenThreeState extends State<ScreenThree> {
                     for (int i = 0; i < questions.length; i++)
                       // questionsRow(no: i + 1, question: questions[i], answer: answers[i])
                   QuestionsRow(no: i+1, child:  GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
                 primary: false,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 5, mainAxisSpacing: 5, crossAxisSpacing: 5),
+                    crossAxisCount: 5, mainAxisSpacing: 10, crossAxisSpacing: 10),
                 itemCount: questions[i].length,
                 itemBuilder: (context, index) {
                   return PuzzelBtn(
@@ -201,88 +202,5 @@ class _ScreenThreeState extends State<ScreenThree> {
           ],
         ));
   }
-
-  // Widget questionsRow({
-  //   required int no,
-  //   required iLs question,
-  //   required iLs answer,
-  // }) {
-  //   return Container(
-  //     margin: const EdgeInsets.all(10),
-  //     padding: const EdgeInsets.only(top: 3),
-  //     decoration: BoxDecoration(
-  //         borderRadius: BorderRadius.circular(20), color: Colors.grey.shade200),
-  //     child: Column(
-  //       children: [
-  //         CircleAvatar(
-  //           child: Text(no.toString().toMM()),
-  //         ),
-  //         Container(
-  //           height: 80,
-  //           decoration: BoxDecoration(
-  //               borderRadius: BorderRadius.circular(20),
-  //               color: Colors.grey.shade200),
-  //           child: GridView.builder(
-  //               primary: false,
-  //               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-  //                   crossAxisCount: 5, mainAxisSpacing: 5, crossAxisSpacing: 5),
-  //               itemCount: question.length,
-  //               itemBuilder: (context, index) {
-  //                 return PuzzelBtn(
-  //                   text: question[index].toString(),
-  //                   onPressed: () {
-  //                     answer.add(question[index]);
-  //                     if (question.length == answer.length) {
-  //                       iLs ls = List.from(question);
-  //                       ls.sort((a, b) => b.compareTo(a));
-  //                       if (listEquals(ls, answer)) {
-  //                         increment();
-  //                       } else {
-  //                         decrement();
-  //                       }
-
-  //                       if (answers.length == (right + wrong)) {
-  //                         Dialogs.showMyDialog(
-  //                           text: Consumer<MyProvider>(
-  //                               builder: (_, myProvider, child) {
-  //                             return Text(
-  //                                 '${totalResults(trueAndFalseAnswer)} \n မှန် ($right)ခု + မှား ($wrong)ခု = (${right + wrong}) ခု'
-  //                                     .toMM());
-  //                           }),
-  //                           parentContext: context,
-  //                           onPressed: () {
-  //                             Navigator.pushAndRemoveUntil(
-  //                                 context,
-  //                                 PageRouteBuilder(
-  //                                     transitionDuration: Duration.zero,
-  //                                     pageBuilder: (_, __, ___) =>
-  //                                         const ScreenThree()),
-  //                                 ModalRoute.withName('/'));
-  //                             setState(() {
-  //                               isTimer = true;
-  //                             });
-  //                           },
-  //                         );
-
-  //                         //adding results to String
-  //                         totalAnswer += 'မှန်-$right + မှား-$wrong ။';
-
-  //                         Provider.of<MyProvider>(context, listen: false)
-  //                             .answerSave3(totalAnswer);
-  //                         Provider.of<MyProvider>(context, listen: false)
-  //                             .increment3();
-  //                         isTimer = !isTimer;
-  //                         // restart();
-  //                       }
-  //                     }
-  //                   },
-  //                   // isEnable: false,
-  //                 );
-  //               }),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
 }

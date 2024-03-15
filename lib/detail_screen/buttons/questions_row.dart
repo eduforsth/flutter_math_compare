@@ -18,6 +18,7 @@ class QuestionsRow extends StatelessWidget {
           CircleAvatar(
             child: Text(no.toString().toMM()),
           ),
+         const SizedBox(height: 5,),
           Container(
             height: 80,
             decoration: BoxDecoration(

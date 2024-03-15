@@ -10,16 +10,13 @@ int randomGenerate() {
 iLs randomGenerateList(int count) {
   iLs list;
   list = List.generate(count, (index) => randomGenerate());
-  if (list.toSet().length < count) {
-    int requiredNum = randomGenerate();
-    for (int i = 0; i < count; i++) {
-      if (!list.contains(requiredNum)) {
-        if (list.length == count) {
-          break;
-        }
-        list.add(requiredNum);
+  // Set<int> set = list.toSet();
+  Set<int> set = {...list};
+  if (set.length < count) {
+    while (set.length < count) {
+     set.add(randomGenerate());
       }
-    }
+    
   }
-  return list;
+  return set.toList();
 }
